@@ -4,6 +4,11 @@
       "id": "mr3dijdvv1f2",
       "nome": "TP-LINK RE505X",
       "estoque": 19
+    },
+    {
+      "id": "mr3fjuhouvmg",
+      "nome": "BROADLINK UNIVERSAL CONTROL RM4 MINI",
+      "estoque": 20
     }
   ],
   "lancamentos": [
@@ -18,5 +23,5 @@
       "data": "2026-07-01"
     }
   ],
-  "savedAt": "2026-07-02T10:42:03.587Z"
+  "savedAt": "2026-07-02T11:37:33.435Z"
 }
