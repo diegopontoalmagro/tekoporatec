@@ -19,6 +19,11 @@
       "id": "mr3fl4g8u202",
       "nome": "TP-LINK EAP110 OUTDOOR 300MBPS",
       "estoque": 20
+    },
+    {
+      "id": "mr3fxitzrpb2",
+      "nome": "FONE BLACKVIEW OPEN-EAR WIRELESS AIRBUDS 200 ECLIPSE BLACK",
+      "estoque": 1
     }
   ],
   "lancamentos": [
@@ -53,5 +58,5 @@
       "data": "2026-07-30"
     }
   ],
-  "savedAt": "2026-07-02T11:44:56.029Z"
+  "savedAt": "2026-07-02T11:48:11.513Z"
 }
