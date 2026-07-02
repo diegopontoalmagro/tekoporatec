@@ -14,6 +14,11 @@
       "id": "mr3fkg3p17nu",
       "nome": "MERCUSYS REPETIDOR ME30 AC1200",
       "estoque": 20
+    },
+    {
+      "id": "mr3fl4g8u202",
+      "nome": "TP-LINK EAP110 OUTDOOR 300MBPS",
+      "estoque": 20
     }
   ],
   "lancamentos": [
@@ -28,5 +33,5 @@
       "data": "2026-07-01"
     }
   ],
-  "savedAt": "2026-07-02T11:38:01.450Z"
+  "savedAt": "2026-07-02T11:38:33.006Z"
 }
