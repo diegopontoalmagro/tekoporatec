@@ -9,6 +9,11 @@
       "id": "mr3fjuhouvmg",
       "nome": "BROADLINK UNIVERSAL CONTROL RM4 MINI",
       "estoque": 20
+    },
+    {
+      "id": "mr3fkg3p17nu",
+      "nome": "MERCUSYS REPETIDOR ME30 AC1200",
+      "estoque": 20
     }
   ],
   "lancamentos": [
@@ -23,5 +28,5 @@
       "data": "2026-07-01"
     }
   ],
-  "savedAt": "2026-07-02T11:37:33.435Z"
+  "savedAt": "2026-07-02T11:38:01.450Z"
 }
