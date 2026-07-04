@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>TekoporãTec</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* ══════════════════════════════════
+   DESIGN: PRETO · BRANCO · LARANJA
+══════════════════════════════════ */
+:root{
+  --bg:  #080808;
+  --bg2: #0d0d0d;
+  --bg3: #121212;
+  --s1:  #181818;
+  --s2:  #202020;
+  --s3:  #2a2a2a;
+  --bd:  rgba(255,255,255,0.07);
+  --bd2: rgba(255,255,255,0.13);
+
+  /* Laranja */
+  --o1:  #c44f00;
+  --o2:  #e05800;
+  --o3:  #ff6600;
+  --o4:  #ff8533;
+  --o5:  #ffaa66;
+
+  /* Destaques */
+  --gr:    #22c55e;
+  --gr-bg: rgba(34,197,94,0.10);
+  --rd:    #ff6b6b;
+  --rd-bg: rgba(255,107,107,0.10);
+  --bl:    #60a5fa;
+  --bl-bg: rgba(96,165,250,0.10);
+  --pu:    #c084fc;
+
+  /* Texto */
+  --tx:  #ffffff;
+  --tx2: #c8c8c8;
+  --tx3: #787878;
+
+  --fn: 'Plus Jakarta Sans', sans-serif;
+  --fd: 'Syne', sans-serif;
+  --fm: 'JetBrains Mono', monospace;
+  --r:  18px;
+  --rs: 12px;
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+html{ scroll-behavior:smooth; }
+
+body{
+  font-family:var(--fn); color:var(--tx); background:var(--bg);
+  min-height:100vh; overflow-x:hidden; font-size:16px;
+  background-image:
+    radial-gradient(ellipse 50% 40% at 10% 0%,   rgba(255,102,0,0.12), transparent),
+    radial-gradient(ellipse 40% 30% at 92% 100%,  rgba(255,102,0,0.07), transparent);
+}
+::-webkit-scrollbar{ width:5px; height:5px; }
+::-webkit-scrollbar-thumb{ background:var(--s3); border-radius:10px; }
+
+/* ── SCREEN MANAGEMENT ── */
+#PAGE-LOGIN, #PAGE-SYNC, #PAGE-APP { display:none; }
+
+/* ── GEM (logo hexágono) ── */
+.gem{
+  flex-shrink:0; position:relative;
+  background: linear-gradient(135deg, var(--o2), var(--o4));
+  clip-path: polygon(46% 0%,78% 14%,96% 48%,80% 78%,50% 100%,20% 80%,4% 46%,18% 14%);
+  box-shadow: 0 0 32px rgba(255,102,0,0.4);
+}
+.gem::after{
+  content:''; position:absolute; inset:0;
+  background: repeating-linear-gradient(110deg, rgba(255,255,255,0.15) 0 2px, transparent 2px 5px);
+  clip-path: inherit;
+}
+.gem-lg{ width:52px; height:58px; }
+.gem-sm{ width:36px; height:40px; }
+
+/* ══════════════════════════════════
+   PÁGINA 1 — LOGIN
+══════════════════════════════════ */
+#PAGE-LOGIN{
+  min-height:100vh;
+  align-items:center;
+  justify-content:center;
+  padding:28px;
+}
+
+.login-card{
+  width:100%; max-width:440px;
+  background:var(--s1);
+  border:1px solid var(--bd2);
+  border-radius:24px;
+  padding:48px 40px;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.7), 0 0 48px rgba(255,102,0,0.15);
+  animation: fadeUp .4s ease;
+}
+@keyframes fadeUp{
+  from{ opacity:0; transform:translateY(16px); }
+  to{   opacity:1; transform:translateY(0); }
+}
+
+.brand{ display:flex; align-items:center; gap:16px; margin-bottom:36px; }
+.brand h1{
+  font-family:var(--fd); font-size:1.5rem; font-weight:800; color:var(--tx);
+}
+.brand p{
+  font-size:0.65rem; letter-spacing:2.5px; text-transform:uppercase;
+  color:var(--tx3); margin-top:3px;
+}
+
+.login-title{ font-family:var(--fd); font-size:1.8rem; font-weight:800; margin-bottom:6px; }
+.login-sub{   font-size:0.95rem; color:var(--tx3); margin-bottom:30px; }
+
+.err-box{
+  display:none;
+  background:var(--rd-bg); border:1px solid rgba(255,107,107,0.25);
+  border-radius:var(--rs); padding:13px 16px;
+  font-size:0.9rem; color:var(--rd); margin-bottom:16px; text-align:center;
+}
+
+.field{ display:flex; flex-direction:column; gap:8px; margin-bottom:18px; }
+.field label{
+  font-size:0.78rem; font-weight:700; letter-spacing:1.2px;
+  text-transform:uppercase; color:var(--tx3);
+}
+.iw{ position:relative; }
+.field input{
+  width:100%; background:var(--bg3); border:1.5px solid var(--bd2);
+  border-radius:var(--rs); padding:14px 16px;
+  font-size:1rem; color:var(--tx); font-family:var(--fn);
+  transition: border-color .2s, background .2s;
+}
+.field input.has-eye{ padding-right:50px; }
+.field input::placeholder{ color:var(--tx3); }
+.field input:focus{
+  outline:none; border-color:var(--o3); background:var(--s2);
+}
+.eye{
+  position:absolute; top:0; right:0; bottom:0; width:50px;
+  display:flex; align-items:center; justify-content:center;
+  background:none; border:none; cursor:pointer;
+  color:var(--tx3); transition:color .2s; z-index:5;
+}
+.eye:hover{ color:var(--o4); }
+
+.btn-login{
+  width:100%;
+  background: linear-gradient(135deg, var(--o2), var(--o3));
+  color:#fff; border:none; border-radius:var(--rs); padding:16px;
+  font-family:var(--fn); font-size:1rem; font-weight:700; cursor:pointer;
+  box-shadow: 0 4px 22px rgba(224,88,0,0.4);
+  transition: all .2s; margin-top:8px; letter-spacing:0.3px;
+}
+.btn-login:hover{
+  transform:translateY(-2px);
+  box-shadow: 0 8px 30px rgba(224,88,0,0.5);
+}
+.login-footer{ margin-top:26px; text-align:center; font-size:0.75rem; color:var(--tx3); }
+
+/* ══════════════════════════════════
+   PÁGINA 2 — SINCRONIZAÇÃO
+══════════════════════════════════ */
+#PAGE-SYNC{
+  min-height:100vh;
+  align-items:center;
+  justify-content:center;
+  padding:28px;
+}
+
+.sync-card{
+  width:100%; max-width:520px;
+  background:var(--s1); border:1px solid var(--bd2); border-radius:24px;
+  padding:44px 40px;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.7), 0 0 40px rgba(255,102,0,0.12);
+  animation: fadeUp .35s ease;
+}
+
+.steps{ display:flex; gap:8px; margin-bottom:26px; }
+.stp{
+  flex:1; height:5px; background:var(--s3); border-radius:4px;
+  transition: background .3s;
+}
+.stp.done{
+  background: linear-gradient(90deg, var(--o2), var(--o4));
+}
+.stp-lbl{ font-size:0.8rem; color:var(--tx3); font-weight:700; margin-bottom:20px; }
+
+.sync-title{ font-family:var(--fd); font-size:1.5rem; font-weight:800; margin-bottom:8px; }
+.sync-sub{   font-size:0.92rem; color:var(--tx3); margin-bottom:22px; line-height:1.6; }
+
+.info-box{
+  background:var(--bg3); border:1px solid var(--bd2);
+  border-radius:var(--rs); padding:16px 18px; margin-bottom:20px;
+}
+.info-box p{ font-size:0.88rem; color:var(--tx2); line-height:1.6; }
+.info-box a{ color:var(--o4); text-decoration:none; font-weight:600; }
+.info-box a:hover{ text-decoration:underline; }
+code{
+  font-family:var(--fm); font-size:0.82rem;
+  background:var(--s2); padding:2px 7px; border-radius:5px; color:var(--o5);
+}
+
+.tut ol{ padding-left:20px; display:flex; flex-direction:column; gap:10px; }
+.tut li{ font-size:0.88rem; color:var(--tx2); line-height:1.6; }
+.tut li b{ color:var(--tx); }
+
+.sync-err{
+  display:none;
+  background:var(--rd-bg); border:1px solid rgba(255,107,107,0.22);
+  border-radius:var(--rs); padding:12px 15px;
+  font-size:0.88rem; color:var(--rd); margin-bottom:16px;
+}
+
+.btn-row{ display:flex; gap:12px; }
+
+.btn-primary{
+  background: linear-gradient(135deg, var(--o2), var(--o3));
+  color:#fff; border:none; border-radius:var(--rs);
+  padding:14px 24px; font-family:var(--fn); font-size:0.92rem; font-weight:700;
+  cursor:pointer; box-shadow:0 4px 18px rgba(224,88,0,0.35);
+  transition:all .2s; flex:1; text-align:center;
+}
+.btn-primary:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 24px rgba(224,88,0,0.45);
+}
+
+.btn-ghost{
+  background:var(--s2); color:var(--tx2);
+  border:1px solid var(--bd2); border-radius:var(--rs);
+  padding:14px 20px; font-family:var(--fn); font-size:0.92rem; font-weight:700;
+  cursor:pointer; transition:all .2s;
+}
+.btn-ghost:hover{ background:var(--s3); color:var(--tx); }
+
+.success-box{
+  background:var(--gr-bg); border:1px solid rgba(34,197,94,0.22);
+  border-radius:var(--rs); padding:13px 16px;
+  font-size:0.88rem; color:var(--gr); margin-bottom:20px;
+}
+
+/* ══════════════════════════════════
+   PÁGINA 3 — APP
+══════════════════════════════════ */
+
+/* Sync bar */
+.sbar{
+  background:var(--bg2); border-bottom:1px solid var(--bd);
+  padding:10px 24px; display:flex; align-items:center;
+  justify-content:space-between; gap:12px; flex-wrap:wrap;
+  font-size:0.82rem; color:var(--tx3);
+  position:sticky; top:0; z-index:200;
+}
+.si{ display:flex; align-items:center; gap:8px; }
+.sdot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.sdot.ok{ background:var(--gr); box-shadow:0 0 8px var(--gr); }
+.sdot.ld{ background:var(--o4); box-shadow:0 0 8px var(--o4); animation:pulse 1s infinite; }
+.sdot.er{ background:var(--rd); }
+@keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.3;} }
+
+.bsm{
+  background:var(--s2); color:var(--tx2); border:1px solid var(--bd2);
+  border-radius:9px; padding:7px 14px;
+  font-family:var(--fn); font-size:0.8rem; font-weight:700;
+  cursor:pointer; transition:all .2s;
+}
+.bsm:hover{ background:var(--s3); color:var(--tx); }
+.bsm.danger{ background:var(--rd-bg); color:var(--rd); border-color:rgba(255,107,107,0.2); }
+.bsm.danger:hover{ background:rgba(255,107,107,0.15); }
+
+/* Layout */
+.app-layout{ display:flex; min-height:calc(100vh - 44px); }
+
+aside{
+  width:248px; flex-shrink:0;
+  background:var(--bg2); border-right:1px solid var(--bd);
+  display:flex; flex-direction:column;
+  padding:26px 15px 22px;
+  position:sticky; top:44px; height:calc(100vh - 44px);
+  overflow-y:auto; z-index:100;
+}
+
+.logo-row{
+  display:flex; align-items:center; gap:12px;
+  padding:0 6px 24px; border-bottom:1px solid var(--bd); margin-bottom:4px;
+}
+.logo-row h2{
+  font-family:var(--fd); font-size:1.05rem; font-weight:800; color:var(--tx);
+}
+.logo-row p{
+  font-size:0.58rem; letter-spacing:2.5px; text-transform:uppercase;
+  color:var(--tx3); margin-top:3px;
+}
+
+.ng{ margin-top:18px; }
+.ngl{
+  font-size:0.65rem; font-weight:700; letter-spacing:2px;
+  text-transform:uppercase; color:var(--tx3); padding:0 10px; margin-bottom:6px;
+}
+.nb{
+  display:flex; align-items:center; gap:11px; width:100%;
+  padding:11px 12px; background:none; border:none; border-radius:11px;
+  color:var(--tx2); font-family:var(--fn); font-size:0.9rem; font-weight:500;
+  cursor:pointer; transition:all .2s; text-align:left; position:relative;
+}
+.nb .ic{ width:17px; height:17px; flex-shrink:0; opacity:.6; }
+.nb:hover{ background:var(--s1); color:var(--tx); }
+.nb.on{
+  background: linear-gradient(135deg, rgba(224,88,0,0.22), rgba(255,102,0,0.10));
+  color:var(--tx); font-weight:600;
+}
+.nb.on .ic{ opacity:1; }
+.nb.on::before{
+  content:''; position:absolute; left:0; top:18%; bottom:18%;
+  width:3px; background:linear-gradient(180deg, var(--o3), var(--o4));
+  border-radius:0 3px 3px 0;
+}
+
+.aside-foot{
+  margin-top:auto; padding-top:16px; border-top:1px solid var(--bd);
+}
+.lout{
+  display:flex; align-items:center; gap:8px; width:100%;
+  padding:11px 12px; background:none; border:1px solid var(--bd2);
+  border-radius:var(--rs); color:var(--tx3); font-family:var(--fn);
+  font-size:0.85rem; font-weight:600; cursor:pointer; transition:all .2s;
+  margin-bottom:10px;
+}
+.lout:hover{ background:var(--rd-bg); border-color:rgba(255,107,107,0.28); color:var(--rd); }
+.af-info{ font-size:0.72rem; color:var(--tx3); line-height:1.6; padding:0 4px; }
+
+main{ flex:1; min-width:0; padding:32px 36px 100px; }
+
+/* Panels */
+.panel{ display:none; }
+.panel.on{ display:block; animation:fadeUp .25s ease; }
+
+/* Page header */
+.ph{ margin-bottom:26px; }
+.ph .bc{
+  font-size:0.72rem; color:var(--tx3); font-weight:700;
+  letter-spacing:1.5px; text-transform:uppercase; margin-bottom:5px;
+}
+.ph h3{
+  font-family:var(--fd); font-size:2rem; font-weight:800;
+  background:linear-gradient(135deg, #ffffff 30%, #aaaaaa);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.ph p{ color:var(--tx2); font-size:0.95rem; margin-top:5px; }
+.ph-row{ display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:14px; }
+.dbadge{
+  font-family:var(--fm); font-size:0.8rem; color:var(--tx3);
+  background:var(--s1); border:1px solid var(--bd2); padding:8px 14px; border-radius:10px;
+}
+
+/* ── KPI CARDS ── */
+.kpi-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));
+  gap:14px; margin-bottom:22px;
+}
+.kpi{
+  background:var(--s1); border:1px solid var(--bd);
+  border-radius:var(--r); padding:24px 24px 20px;
+  position:relative; overflow:hidden;
+  transition:transform .2s, box-shadow .2s;
+  min-height:130px;
+}
+.kpi:hover{ transform:translateY(-3px); box-shadow:0 12px 32px rgba(0,0,0,0.4); }
+.kpi::after{
+  content:''; position:absolute; top:-24px; right:-24px;
+  width:100px; height:100px; border-radius:50%;
+  background:radial-gradient(circle, rgba(255,255,255,0.025), transparent);
+}
+
+/* Accent (laranja) */
+.kpi.ac{
+  background: linear-gradient(135deg, #1a0900 0%, #2d1200 50%, #3a1800 100%);
+  border-color:rgba(255,102,0,0.3);
+  box-shadow:0 0 36px rgba(255,102,0,0.18);
+}
+/* Gold/branco */
+.kpi.wh{
+  background: linear-gradient(135deg, #161616, #1e1e1e);
+  border-color:rgba(255,255,255,0.15);
+}
+/* Purple */
+.kpi.pu{
+  background: linear-gradient(135deg, #150f24, #1e1535);
+  border-color:rgba(192,132,252,0.2);
+}
+/* Blue */
+.kpi.bl{
+  background: linear-gradient(135deg, #091525, #0f1e35);
+  border-color:rgba(96,165,250,0.18);
+}
+
+.kl{
+  font-size:0.75rem; font-weight:700; letter-spacing:1.5px;
+  text-transform:uppercase; color:var(--tx3); margin-bottom:12px;
+}
+.kpi.ac .kl{ color:rgba(255,165,100,0.7); }
+.kpi.wh .kl{ color:rgba(255,255,255,0.45); }
+.kpi.pu .kl{ color:rgba(192,132,252,0.7); }
+.kpi.bl .kl{ color:rgba(96,165,250,0.7); }
+
+.kv{
+  font-family:var(--fm); font-size:1.7rem; font-weight:600;
+  color:var(--tx); letter-spacing:-.5px; line-height:1.1;
+}
+.kpi.ac .kv{ color:var(--o4); }
+.kpi.wh .kv{ color:#ffffff; }
+.kpi.pu .kv{ color:var(--pu); }
+.kpi.bl .kv{ color:var(--bl); }
+
+.ks{ font-size:0.78rem; color:var(--tx3); margin-top:6px; line-height:1.4; }
+.kpi.ac .ks{ color:rgba(255,140,80,0.55); }
+.kpi.wh .ks{ color:rgba(255,255,255,0.38); }
+.kpi.pu .ks{ color:rgba(192,132,252,0.55); }
+.kpi.bl .ks{ color:rgba(96,165,250,0.55); }
+
+.kbadge{
+  display:inline-flex; align-items:center; gap:4px;
+  margin-top:10px; padding:4px 10px; border-radius:20px;
+  font-size:0.74rem; font-weight:700;
+}
+.kbadge.up{ background:var(--gr-bg); color:var(--gr); }
+.kbadge.dn{ background:var(--rd-bg); color:var(--rd); }
+
+/* ── TWO-COL / CHART CARDS ── */
+.two-col{
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:16px; margin-bottom:22px;
+}
+.cc{
+  background:var(--s1); border:1px solid var(--bd);
+  border-radius:var(--r); padding:22px 24px; overflow:hidden;
+}
+.cc-hdr{
+  display:flex; justify-content:space-between;
+  align-items:flex-start; margin-bottom:18px; flex-wrap:wrap; gap:8px;
+}
+.cc-title{
+  font-family:var(--fd); font-size:1.05rem; font-weight:800; color:var(--tx);
+}
+.cc-sub{ font-size:0.76rem; color:var(--tx3); margin-top:3px; }
+.lg{ display:flex; gap:14px; flex-wrap:wrap; }
+.lgi{ display:flex; align-items:center; gap:6px; font-size:0.78rem; color:var(--tx2); }
+.lgd{ width:9px; height:9px; border-radius:50%; }
+.cw-240{ height:250px; position:relative; }
+.cw-200{ height:210px; position:relative; }
+
+/* ── STAT ROWS ── */
+.stat-row{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:10px 0; border-bottom:1px solid var(--bd);
+}
+.stat-row:last-child{ border:none; }
+.stat-row .lbl{ font-size:0.88rem; color:var(--tx2); }
+.stat-row .val{ font-family:var(--fm); font-size:0.9rem; font-weight:600; color:var(--tx); }
+
+.prog-bar{ background:var(--s3); border-radius:4px; height:5px; overflow:hidden; margin-top:7px; }
+.prog-fill{ height:100%; border-radius:4px; transition:width .6s ease; }
+
+/* ── SECTION HEADER ── */
+.sh2{
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:14px; flex-wrap:wrap; gap:10px;
+}
+.st{ font-size:1.05rem; font-weight:700; color:var(--tx); }
+
+/* ── TABLES ── */
+.tc{
+  background:var(--s1); border:1px solid var(--bd);
+  border-radius:var(--r); overflow:hidden; margin-bottom:22px;
+}
+.tscr{ overflow-x:auto; }
+table{ width:100%; border-collapse:collapse; min-width:680px; }
+th{
+  background:var(--bg3); color:var(--tx3); font-size:0.72rem;
+  letter-spacing:1.2px; text-transform:uppercase; font-weight:700;
+  padding:13px 16px; text-align:left; border-bottom:1px solid var(--bd);
+  white-space:nowrap;
+}
+td{
+  padding:13px 16px; font-size:0.88rem; color:var(--tx);
+  border-bottom:1px solid var(--bd); white-space:nowrap;
+}
+td.mn{ font-family:var(--fm); font-size:0.84rem; }
+tr:last-child td{ border-bottom:none; }
+tr:hover td{ background:rgba(255,255,255,0.02); }
+
+.chip{
+  display:inline-flex; padding:4px 11px; border-radius:20px;
+  font-size:0.72rem; font-weight:700;
+}
+.chip.sh{ background:rgba(255,102,0,0.15); color:var(--o4); }
+.chip.ml{ background:rgba(255,255,255,0.08); color:#dddddd; }
+
+.pup{ color:var(--gr); font-family:var(--fm); font-weight:600; }
+.pdn{ color:var(--rd); font-family:var(--fm); font-weight:600; }
+
+.dbtn{
+  background:none; border:none; color:var(--tx3); cursor:pointer;
+  font-size:0.78rem; font-weight:700; transition:color .15s;
+  padding:3px 8px; border-radius:5px;
+}
+.dbtn:hover{ color:var(--rd); background:var(--rd-bg); }
+
+/* ── EMPTY ── */
+.empty{ padding:50px 20px; text-align:center; }
+.eg{
+  width:42px; height:46px; margin:0 auto 14px;
+  background:linear-gradient(135deg, var(--s3), var(--s2));
+  clip-path:polygon(46% 0%,78% 14%,96% 48%,80% 78%,50% 100%,20% 80%,4% 46%,18% 14%);
+  opacity:.3;
+}
+.empty p{ color:var(--tx3); font-size:0.9rem; font-style:italic; }
+
+/* ── FORM CARDS ── */
+.fcard{
+  background:var(--s1); border:1px solid var(--bd);
+  border-radius:var(--r); padding:26px; margin-bottom:22px;
+}
+.pbadge{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:6px 15px; border-radius:9px;
+  font-size:0.75rem; font-weight:700; letter-spacing:1px;
+  text-transform:uppercase; margin-bottom:20px;
+}
+.pbadge.sh{ background:rgba(255,102,0,0.12); color:var(--o4); border:1px solid rgba(255,102,0,0.2); }
+.pbadge.ml{ background:rgba(255,255,255,0.07); color:#dddddd; border:1px solid rgba(255,255,255,0.15); }
+
+.fg{ display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:16px; }
+.fld{ display:flex; flex-direction:column; gap:7px; }
+.fld label{
+  font-size:0.75rem; font-weight:700; letter-spacing:1px;
+  text-transform:uppercase; color:var(--tx3);
+}
+.fld input, .fld select{
+  width:100%; background:var(--bg3); border:1.5px solid var(--bd2);
+  border-radius:var(--rs); padding:12px 14px;
+  font-size:0.92rem; color:var(--tx); font-family:var(--fn);
+  transition:border-color .2s, background .2s;
+}
+.fld input::placeholder{ color:var(--tx3); }
+.fld input:focus, .fld select:focus{
+  outline:none; border-color:var(--o3); background:var(--s2);
+}
+.fld select option{ background:var(--bg3); }
+
+.crow{ grid-column:1/-1; display:flex; gap:10px; flex-wrap:wrap; }
+.cbox{
+  flex:1; min-width:120px; background:var(--bg3);
+  border:1px solid var(--bd); border-radius:var(--rs); padding:14px 16px;
+}
+.clbl{
+  font-size:0.68rem; font-weight:700; letter-spacing:1.2px;
+  text-transform:uppercase; color:var(--tx3);
+}
+.cval{
+  font-family:var(--fm); font-size:1.08rem; font-weight:600;
+  color:var(--tx); margin-top:6px;
+}
+.fa{ display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
+
+.btn-form{
+  background:linear-gradient(135deg, var(--o2), var(--o3)); color:#fff; border:none;
+  border-radius:var(--rs); padding:13px 24px;
+  font-family:var(--fn); font-size:0.9rem; font-weight:700; cursor:pointer;
+  box-shadow:0 4px 16px rgba(224,88,0,0.3); transition:all .2s;
+}
+.btn-form:hover{ transform:translateY(-1px); box-shadow:0 6px 22px rgba(224,88,0,0.4); }
+
+.btn-form-g{
+  background:var(--s2); color:var(--tx2); border:1px solid var(--bd2);
+  border-radius:var(--rs); padding:13px 18px;
+  font-family:var(--fn); font-size:0.88rem; font-weight:700; cursor:pointer;
+  transition:all .2s;
+}
+.btn-form-g:hover{ background:var(--s3); color:var(--tx); }
+
+/* ── STOCK BADGES ── */
+.bok{
+  background:var(--gr-bg); color:var(--gr); font-family:var(--fm);
+  font-size:0.82rem; font-weight:700; padding:4px 10px; border-radius:8px;
+}
+.blo{
+  background:var(--rd-bg); color:var(--rd); font-family:var(--fm);
+  font-size:0.82rem; font-weight:700; padding:4px 10px; border-radius:8px;
+}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed; bottom:26px; right:26px; z-index:9999;
+  background:var(--s2); border:1px solid var(--bd2);
+  border-left:3px solid var(--o3); color:var(--tx);
+  padding:14px 20px; border-radius:var(--rs); font-size:0.88rem; font-weight:500;
+  box-shadow:0 12px 36px rgba(0,0,0,.6);
+  opacity:0; transform:translateY(10px);
+  transition:all .3s ease; pointer-events:none; max-width:300px;
+}
+.toast.on{ opacity:1; transform:translateY(0); }
+
+/* ── MOBILE NAV ── */
+.mnav{
+  display:none; position:fixed; bottom:0; left:0; right:0; z-index:200;
+  background:rgba(8,8,8,0.97); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+  border-top:1px solid rgba(255,102,0,0.15);
+  padding:10px 8px max(env(safe-area-inset-bottom),13px);
+  justify-content:space-around;
+}
+.mb{
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+  padding:6px 10px; background:none; border:none;
+  color:var(--tx3); font-family:var(--fn); font-size:0.62rem;
+  font-weight:700; letter-spacing:.5px; text-transform:uppercase;
+  cursor:pointer; border-radius:11px; transition:all .2s;
+  flex:1; max-width:70px;
+}
+.mb .ic{ width:21px; height:21px; transition:all .2s; }
+.mb.on{ color:var(--o4); }
+.mb.on .ic{ filter:drop-shadow(0 0 6px rgba(255,102,0,0.7)); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .app-layout{ flex-direction:column; }
+  aside{ display:none; }
+  main{ padding:18px 15px calc(88px + env(safe-area-inset-bottom)); }
+  .mnav{ display:flex; }
+  .kpi-grid{ grid-template-columns:1fr 1fr; gap:10px; }
+  .kv{ font-size:1.35rem; }
+  .two-col{ grid-template-columns:1fr; }
+  .cw-240{ height:200px; }
+  .cw-200{ height:180px; }
+  .ph h3{ font-size:1.6rem; }
+  .fg{ grid-template-columns:1fr 1fr; }
+  .toast{ bottom:calc(82px + env(safe-area-inset-bottom)); right:12px; left:12px; max-width:none; }
+  .sbar{ font-size:0.76rem; padding:8px 14px; }
+  .login-card{ padding:36px 26px; }
+  .sync-card{ padding:36px 26px; }
+}
+@media(max-width:480px){
+  .fg{ grid-template-columns:1fr; }
+  .kpi-grid{ grid-template-columns:1fr 1fr; }
+  .kv{ font-size:1.2rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════
+     PÁGINA 1 — LOGIN
+═══════════════════════════════════ -->
+<div id="PAGE-LOGIN">
+  <div class="login-card">
+    <div class="brand">
+      <div class="gem gem-lg"></div>
+      <div>
+        <h1>TekoporãTec</h1>
+        <p>Tecnologia com Propósito</p>
+      </div>
+    </div>
+    <div class="login-title">Bem-vindo de volta</div>
+    <div class="login-sub">Painel executivo — acesso exclusivo</div>
+
+    <div class="err-box" id="login-err">Usuário ou senha incorretos.</div>
+
+    <div class="field">
+      <label>Usuário</label>
+      <input type="text" id="l-user" placeholder="diegodonat" autocomplete="username">
+    </div>
+    <div class="field">
+      <label>Senha</label>
+      <div class="iw">
+        <input type="password" id="l-pass" placeholder="••••••••••"
+               autocomplete="current-password" class="has-eye">
+        <button type="button" class="eye" id="btn-eye" aria-label="Mostrar senha">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <button type="button" class="btn-login" id="btn-entrar">Entrar no painel</button>
+    <div class="login-footer">© 2025 TekoporãTec — Uso interno exclusivo</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     PÁGINA 2 — SINCRONIZAÇÃO
+═══════════════════════════════════ -->
+<div id="PAGE-SYNC">
+  <div class="sync-card">
+    <div class="brand" style="margin-bottom:28px;">
+      <div class="gem gem-sm"></div>
+      <div>
+        <h1 style="font-family:var(--fd);font-size:1.2rem;font-weight:800;color:var(--tx);">TekoporãTec</h1>
+        <p style="font-size:0.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--tx3);margin-top:3px;">Configuração de Sincronização</p>
+      </div>
+    </div>
+
+    <div class="steps">
+      <div class="stp done" id="st1"></div>
+      <div class="stp"      id="st2"></div>
+      <div class="stp"      id="st3"></div>
+    </div>
+    <div class="stp-lbl" id="stplbl">Passo 1 de 3</div>
+
+    <!-- Passo 1 -->
+    <div id="sync-p1">
+      <div class="sync-title">Configurar sincronização</div>
+      <div class="sync-sub">Seus dados ficam salvos no GitHub e sincronizam em qualquer dispositivo automaticamente.</div>
+      <div class="info-box">
+        <p>💡 Sem repositório? Acesse <a href="https://github.com/new" target="_blank">github.com/new</a>, crie um chamado <code>tekoporatec</code> e volte aqui.</p>
+      </div>
+      <div class="field" style="margin-bottom:16px;">
+        <label>Usuário do GitHub</label>
+        <input type="text" id="g-user" placeholder="ex: diegodonat" autocomplete="off">
+      </div>
+      <div class="field" style="margin-bottom:16px;">
+        <label>Nome do repositório</label>
+        <input type="text" id="g-repo" placeholder="ex: tekoporatec" autocomplete="off">
+      </div>
+      <div class="sync-err" id="err-p1"></div>
+      <button type="button" class="btn-primary" id="btn-p1">Próximo →</button>
+    </div>
+
+    <!-- Passo 2 -->
+    <div id="sync-p2" style="display:none;">
+      <div class="sync-title">Chave de acesso</div>
+      <div class="sync-sub">Crie um token no GitHub uma única vez para autorizar o salvamento automático.</div>
+      <div class="info-box tut">
+        <ol>
+          <li>Acesse <a href="https://github.com/settings/tokens/new" target="_blank" style="color:var(--o4);font-weight:600;text-decoration:none;">github.com/settings/tokens/new</a></li>
+          <li>Em <b>Note</b>: escreva <code>TekoporãTec</code></li>
+          <li>Em <b>Expiration</b>: escolha <code>No expiration</code></li>
+          <li>Marque a caixa <b>repo</b> (primeira da lista)</li>
+          <li>Clique em <b>Generate token</b> no final da página</li>
+          <li>Copie o token (começa com <code>ghp_</code>) e cole abaixo</li>
+        </ol>
+      </div>
+      <div class="field" style="margin:18px 0 16px;">
+        <label>Token do GitHub</label>
+        <div class="iw">
+          <input type="password" id="g-token" placeholder="ghp_xxxxxxxxxxxxxxxx"
+                 autocomplete="off" class="has-eye">
+          <button type="button" class="eye" id="btn-eye-token" aria-label="Mostrar token">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="sync-err" id="err-p2"></div>
+      <div class="btn-row">
+        <button type="button" class="btn-ghost" id="btn-back">← Voltar</button>
+        <button type="button" class="btn-primary" id="btn-p2">Verificar e conectar →</button>
+      </div>
+    </div>
+
+    <!-- Passo 3 -->
+    <div id="sync-p3" style="display:none; text-align:center;">
+      <div style="font-size:3.2rem; margin-bottom:16px;">🎉</div>
+      <div class="sync-title">Tudo configurado!</div>
+      <div class="sync-sub">Seus dados agora sincronizam automaticamente em qualquer dispositivo onde você acessar o site.</div>
+      <div class="success-box" style="text-align:left;">
+        ✅ GitHub conectado. O arquivo <code>tktec-data.json</code> será criado no seu repositório.
+      </div>
+      <button type="button" class="btn-primary" id="btn-p3" style="width:100%; margin-top:6px;">
+        Abrir o painel executivo →
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     PÁGINA 3 — APP (DASHBOARD)
+═══════════════════════════════════ -->
+<div id="PAGE-APP">
+
+  <!-- Sync Bar -->
+  <div class="sbar">
+    <div class="si">
+      <div class="sdot ld" id="sdot"></div>
+      <span id="stxt">Conectando ao GitHub...</span>
+    </div>
+    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+      <span style="font-size:0.74rem; color:var(--tx3);">
+        Repo: <b id="ghlbl" style="color:var(--tx2);">—</b>
+      </span>
+      <button class="bsm" id="btn-save">💾 Salvar agora</button>
+      <button class="bsm danger" id="btn-reconfig">Reconfigurar</button>
+    </div>
+  </div>
+
+  <div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside>
+      <div class="logo-row">
+        <div class="gem gem-sm"></div>
+        <div><h2>TekoporãTec</h2><p>Tecnologia com Propósito</p></div>
+      </div>
+
+      <div class="ng">
+        <div class="ngl">Painel</div>
+        <button class="nb on" data-tab="geral">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="13" width="4" height="8" rx="1"/><rect x="10" y="8" width="4" height="13" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>
+          Dashboard
+        </button>
+      </div>
+      <div class="ng">
+        <div class="ngl">Plataformas</div>
+        <button class="nb" data-tab="shopee">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.6 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>
+          Shopee
+        </button>
+        <button class="nb" data-tab="ml">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Mercado Livre
+        </button>
+      </div>
+      <div class="ng">
+        <div class="ngl">Inventário</div>
+        <button class="nb" data-tab="produtos">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          Produtos &amp; Estoque
+        </button>
+      </div>
+      <div class="ng">
+        <div class="ngl">Registrar</div>
+        <button class="nb" data-tab="lancar">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Novo Lançamento
+        </button>
+      </div>
+
+      <div class="aside-foot">
+        <button class="lout" id="btn-logout">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sair da conta
+        </button>
+        <div class="af-info">Logado como <b style="color:var(--tx2)">diegodonat</b></div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main>
+
+      <!-- DASHBOARD -->
+      <section class="panel on" id="panel-geral">
+        <div class="ph">
+          <div class="ph-row">
+            <div>
+              <div class="bc">TekoporãTec · Painel</div>
+              <h3>Dashboard Executivo</h3>
+              <p id="d-hoje"></p>
+            </div>
+            <div class="dbadge" id="d-badge"></div>
+          </div>
+        </div>
+
+        <div class="kpi-grid" id="kpi-r1"></div>
+        <div class="kpi-grid" id="kpi-r2"></div>
+
+        <div class="two-col">
+          <div class="cc">
+            <div class="cc-hdr">
+              <div><div class="cc-title">Lucro ao longo do tempo</div><div class="cc-sub">Evolução mensal acumulada</div></div>
+            </div>
+            <div class="cw-240"><canvas id="ch-line"></canvas></div>
+          </div>
+          <div class="cc">
+            <div class="cc-hdr">
+              <div><div class="cc-title">Distribuição de receita</div><div class="cc-sub">Shopee vs Mercado Livre</div></div>
+            </div>
+            <div class="cw-240" style="display:flex;align-items:center;justify-content:center;">
+              <canvas id="ch-donut"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="cc">
+            <div class="cc-hdr">
+              <div><div class="cc-title">Comparativo financeiro</div><div class="cc-sub">Por plataforma</div></div>
+              <div class="lg">
+                <div class="lgi"><div class="lgd" style="background:var(--o3)"></div>Shopee</div>
+                <div class="lgi"><div class="lgd" style="background:#aaaaaa"></div>ML</div>
+              </div>
+            </div>
+            <div class="cw-240"><canvas id="ch-bar"></canvas></div>
+          </div>
+          <div class="cc">
+            <div class="cc-hdr">
+              <div><div class="cc-title">Radar de performance</div><div class="cc-sub">Multidimensional</div></div>
+            </div>
+            <div class="cw-240"><canvas id="ch-radar"></canvas></div>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="cc">
+            <div class="cc-hdr"><div class="cc-title">Shopee vs Mercado Livre</div></div>
+            <div id="plat-stats"></div>
+          </div>
+          <div class="cc">
+            <div class="cc-hdr">
+              <div><div class="cc-title">Top Produtos</div><div class="cc-sub">Por receita gerada</div></div>
+            </div>
+            <div id="top-prods"></div>
+          </div>
+        </div>
+
+        <div class="sh2"><div class="st">Todos os lançamentos</div></div>
+        <div class="tc"><div class="tscr" id="tbl-geral"></div></div>
+      </section>
+
+      <!-- SHOPEE -->
+      <section class="panel" id="panel-shopee">
+        <div class="ph">
+          <div class="bc">TekoporãTec · Shopee</div>
+          <h3>Shopee</h3>
+          <p>Performance e histórico de vendas na Shopee</p>
+        </div>
+        <div class="kpi-grid" id="kpi-sh"></div>
+        <div class="two-col">
+          <div class="cc"><div class="cc-hdr"><div class="cc-title">Lucro mensal</div></div><div class="cw-200"><canvas id="ch-sh-l"></canvas></div></div>
+          <div class="cc"><div class="cc-hdr"><div class="cc-title">Investido vs Recebido</div></div><div class="cw-200"><canvas id="ch-sh-b"></canvas></div></div>
+        </div>
+        <div class="sh2"><div class="st">Histórico Shopee</div></div>
+        <div class="tc"><div class="tscr" id="tbl-sh"></div></div>
+      </section>
+
+      <!-- MERCADO LIVRE -->
+      <section class="panel" id="panel-ml">
+        <div class="ph">
+          <div class="bc">TekoporãTec · Mercado Livre</div>
+          <h3>Mercado Livre</h3>
+          <p>Performance e histórico de vendas no Mercado Livre</p>
+        </div>
+        <div class="kpi-grid" id="kpi-ml"></div>
+        <div class="two-col">
+          <div class="cc"><div class="cc-hdr"><div class="cc-title">Lucro mensal</div></div><div class="cw-200"><canvas id="ch-ml-l"></canvas></div></div>
+          <div class="cc"><div class="cc-hdr"><div class="cc-title">Investido vs Recebido</div></div><div class="cw-200"><canvas id="ch-ml-b"></canvas></div></div>
+        </div>
+        <div class="sh2"><div class="st">Histórico Mercado Livre</div></div>
+        <div class="tc"><div class="tscr" id="tbl-ml"></div></div>
+      </section>
+
+      <!-- PRODUTOS -->
+      <section class="panel" id="panel-produtos">
+        <div class="ph">
+          <div class="bc">TekoporãTec · Estoque</div>
+          <h3>Produtos &amp; Estoque</h3>
+          <p>Catálogo e controle de inventário</p>
+        </div>
+        <div class="sh2"><div class="st">Cadastrar produto</div></div>
+        <div class="fcard">
+          <div class="fg">
+            <div class="fld">
+              <label>Nome do produto</label>
+              <input type="text" id="p-nome" placeholder="Ex: Fone Bluetooth X1">
+            </div>
+            <div class="fld">
+              <label>Estoque inicial</label>
+              <input type="number" id="p-est" min="0" placeholder="0">
+            </div>
+          </div>
+          <div class="fa">
+            <button type="button" class="btn-form" id="btn-prod">Cadastrar produto</button>
+          </div>
+        </div>
+        <div class="sh2">
+          <div class="st">Estoque atual</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn-form-g" id="btn-excel">Exportar Excel</button>
+            <button class="btn-form-g" id="btn-pdf">Exportar PDF</button>
+          </div>
+        </div>
+        <div class="tc"><div class="tscr" id="tbl-prod"></div></div>
+      </section>
+
+      <!-- NOVO LANÇAMENTO -->
+      <section class="panel" id="panel-lancar">
+        <div class="ph">
+          <div class="bc">TekoporãTec · Registrar</div>
+          <h3>Novo Lançamento</h3>
+          <p>Registre uma venda em qualquer plataforma</p>
+        </div>
+        <div class="sh2"><div class="st">Selecionar plataforma</div></div>
+        <div style="display:flex; gap:12px; margin-bottom:22px; flex-wrap:wrap;">
+          <button class="btn-form"   id="btn-plat-sh" onclick="setPlat('shopee')">🟠 Shopee</button>
+          <button class="btn-form-g" id="btn-plat-ml" onclick="setPlat('ml')">⬜ Mercado Livre</button>
+        </div>
+        <div class="fcard">
+          <div class="pbadge sh" id="plat-badge">Shopee</div>
+          <div class="fg">
+            <div class="fld"><label>Produto</label><select id="f-sel"></select></div>
+            <div class="fld"><label>Quantidade vendida</label><input type="number" id="f-qtd" min="1" value="1"></div>
+            <div class="fld"><label>Valor pago US$</label><input type="number" id="f-usd" step="0.01" min="0" placeholder="0.00"></div>
+            <div class="fld"><label>Cotação do dólar R$</label><input type="number" id="f-tax" step="0.0001" min="0" placeholder="0.00"></div>
+            <div class="fld"><label>Valor recebido R$</label><input type="number" id="f-rec" step="0.01" min="0" placeholder="0.00"></div>
+            <div class="fld"><label>Data da venda</label><input type="date" id="f-dat"></div>
+            <div class="crow">
+              <div class="cbox"><div class="clbl">Custo R$</div><div class="cval" id="c-custo">R$ 0,00</div></div>
+              <div class="cbox"><div class="clbl">Lucro</div><div class="cval" id="c-lucro">R$ 0,00</div></div>
+              <div class="cbox"><div class="clbl">Margem</div><div class="cval" id="c-mg">0,0%</div></div>
+              <div class="cbox"><div class="clbl">ROI</div><div class="cval" id="c-roi">0,0%</div></div>
+            </div>
+          </div>
+          <div class="fa">
+            <button type="button" class="btn-form" id="btn-salvar">Salvar lançamento</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Mobile Nav -->
+  <nav class="mnav">
+    <button class="mb on" data-tab="geral"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="13" width="4" height="8" rx="1"/><rect x="10" y="8" width="4" height="13" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>Painel</button>
+    <button class="mb" data-tab="shopee"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.6 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>Shopee</button>
+    <button class="mb" data-tab="ml"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>ML</button>
+    <button class="mb" data-tab="produtos"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>Estoque</button>
+    <button class="mb" data-tab="lancar"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Novo</button>
+  </nav>
+</div>
+
+<div class="toast" id="toast-el"></div>
+
+<script>
+'use strict';
+// ════════════════════════════════════════
+// CONSTANTES
+// ════════════════════════════════════════
+const CORRECT_USER = 'diegodonat';
+const CORRECT_HASH = 'b7d019073af2bed8f033630137b286195e626835cea2c3160085806eb6b0736a';
+const CFG_KEY      = 'tktec_cfg';
+const AUTH_KEY     = 'tktec_ok';
+
+// ════════════════════════════════════════
+// NAVEGAÇÃO ENTRE PÁGINAS
+// Cada página é um bloco completamente independente
+// ════════════════════════════════════════
+function showPage(page) {
+  document.getElementById('PAGE-LOGIN').style.display = 'none';
+  document.getElementById('PAGE-SYNC').style.display  = 'none';
+  document.getElementById('PAGE-APP').style.display   = 'none';
+
+  if (page === 'login') {
+    document.getElementById('PAGE-LOGIN').style.display = 'flex';
+  } else if (page === 'sync') {
+    document.getElementById('PAGE-SYNC').style.display  = 'flex';
+  } else if (page === 'app') {
+    document.getElementById('PAGE-APP').style.display   = 'block';
+  }
+}
+
+// ════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════
+async function sha256(s) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+const R   = v => 'R$ '  + (+v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const U   = v => 'US$ ' + (+v||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const Pct = v => (+v||0).toFixed(1) + '%';
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const esc = s => String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+let _toastTimer;
+function toast(msg, dur=2800) {
+  const el = document.getElementById('toast-el');
+  el.textContent = msg;
+  el.classList.add('on');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('on'), dur);
+}
+
+// ════════════════════════════════════════
+// CONFIGURAÇÃO GITHUB
+// ════════════════════════════════════════
+function getCfg()    { try { return JSON.parse(localStorage.getItem(CFG_KEY) || '{}'); } catch { return {}; } }
+function setCfg(c)   { localStorage.setItem(CFG_KEY, JSON.stringify(c)); }
+function clearCfg()  { localStorage.removeItem(CFG_KEY); }
+
+// ════════════════════════════════════════
+// PÁGINA 1 — LOGIN
+// ════════════════════════════════════════
+// Toggle olho senha
+document.getElementById('btn-eye').addEventListener('click', function() {
+  const inp = document.getElementById('l-pass');
+  inp.type = (inp.type === 'password') ? 'text' : 'password';
+});
+
+// Botão entrar
+document.getElementById('btn-entrar').addEventListener('click', async function() {
+  const user = document.getElementById('l-user').value.trim();
+  const pass = document.getElementById('l-pass').value;
+  const errBox = document.getElementById('login-err');
+
+  if (!user || !pass) {
+    errBox.style.display = 'block';
+    errBox.textContent = 'Preencha usuário e senha.';
+    return;
+  }
+
+  const hash = await sha256(pass);
+
+  if (user === CORRECT_USER && hash === CORRECT_HASH) {
+    // Login OK
+    errBox.style.display = 'none';
+    sessionStorage.setItem(AUTH_KEY, '1');
+
+    const cfg = getCfg();
+    if (cfg.user && cfg.repo && cfg.token) {
+      // Já configurado → vai direto para o app
+      showPage('app');
+      initApp();
+    } else {
+      // Não configurado → vai para sync
+      showPage('sync');
+      setStep(1);
+    }
+  } else {
+    errBox.style.display = 'block';
+    errBox.textContent = 'Usuário ou senha incorretos. Verifique e tente novamente.';
+    document.getElementById('l-pass').value = '';
+    document.getElementById('l-pass').focus();
+  }
+});
+
+// Enter no campo senha também aciona login
+document.getElementById('l-pass').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') document.getElementById('btn-entrar').click();
+});
+document.getElementById('l-user').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') document.getElementById('l-pass').focus();
+});
+
+// ════════════════════════════════════════
+// PÁGINA 2 — SYNC (SETUP)
+// ════════════════════════════════════════
+let setupTmp = {};
+
+function setStep(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById('sync-p'+i).style.display = (i === n) ? 'block' : 'none';
+    document.getElementById('st'+i).classList.toggle('done', i <= n);
+  });
+  const labels = ['Passo 1 de 3 — Repositório GitHub', 'Passo 2 de 3 — Chave de acesso', 'Passo 3 de 3 — Conectado!'];
+  document.getElementById('stplbl').textContent = labels[n-1];
+}
+
+// Toggle olho token
+document.getElementById('btn-eye-token').addEventListener('click', function() {
+  const inp = document.getElementById('g-token');
+  inp.type = (inp.type === 'password') ? 'text' : 'password';
+});
+
+document.getElementById('btn-p1').addEventListener('click', function() {
+  const u = document.getElementById('g-user').value.trim();
+  const r = document.getElementById('g-repo').value.trim();
+  const err = document.getElementById('err-p1');
+  if (!u || !r) { err.textContent = 'Preencha usuário e nome do repositório.'; err.style.display='block'; return; }
+  err.style.display = 'none';
+  setupTmp = { user: u, repo: r };
+  setStep(2);
+});
+
+document.getElementById('btn-back').addEventListener('click', () => setStep(1));
+
+document.getElementById('btn-p2').addEventListener('click', async function() {
+  const t = document.getElementById('g-token').value.trim();
+  const err = document.getElementById('err-p2');
+  if (!t) { err.textContent = 'Cole o token gerado no GitHub.'; err.style.display='block'; return; }
+  err.textContent = 'Verificando conexão...'; err.style.display = 'block';
+  try {
+    const res = await fetch(`https://api.github.com/repos/${setupTmp.user}/${setupTmp.repo}`, {
+      headers: { Authorization: `token ${t}`, Accept: 'application/vnd.github+json' }
+    });
+    if (!res.ok) throw new Error('Repositório não encontrado ou token inválido. Verifique os dados.');
+    err.style.display = 'none';
+    setCfg({ user: setupTmp.user, repo: setupTmp.repo, token: t });
+    setStep(3);
+  } catch(e) {
+    err.textContent = e.message;
+    err.style.display = 'block';
+  }
+});
+
+document.getElementById('btn-p3').addEventListener('click', function() {
+  showPage('app');
+  initApp();
+});
+
+// ════════════════════════════════════════
+// PÁGINA 3 — APP
+// ════════════════════════════════════════
+let produtos = [], lancamentos = [], charts = {};
+let _saveTimer = null;
+
+// Sair
+document.getElementById('btn-logout').addEventListener('click', function() {
+  if (!confirm('Sair do painel?')) return;
+  sessionStorage.removeItem(AUTH_KEY);
+  showPage('login');
+  document.getElementById('l-user').value = '';
+  document.getElementById('l-pass').value = '';
+});
+
+// Reconfigurar
+document.getElementById('btn-reconfig').addEventListener('click', function() {
+  if (!confirm('Remover configuração do GitHub e reconfigurar?')) return;
+  clearCfg();
+  showPage('sync');
+  setStep(1);
+});
+
+// Sync status
+function setSync(state, msg) {
+  document.getElementById('sdot').className = 'sdot ' + state;
+  document.getElementById('stxt').textContent = msg;
+}
+
+// Github API
+let fileSHA = null;
+async function ghGet() {
+  const c = getCfg();
+  try {
+    const r = await fetch(`https://api.github.com/repos/${c.user}/${c.repo}/contents/tktec-data.json`, {
+      headers: { Authorization: `token ${c.token}`, Accept: 'application/vnd.github+json' }
+    });
+    if (r.status === 404) return null;
+    if (!r.ok) throw new Error('Erro ao buscar dados do GitHub');
+    const j = await r.json();
+    fileSHA = j.sha;
+    return JSON.parse(atob(j.content.replace(/\n/g, '')));
+  } catch(e) { console.error(e); return null; }
+}
+
+async function ghPut(data) {
+  const c = getCfg();
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+  const body = { message: 'TekoporãTec: atualização', content };
+  if (fileSHA) body.sha = fileSHA;
+  const r = await fetch(`https://api.github.com/repos/${c.user}/${c.repo}/contents/tktec-data.json`, {
+    method: 'PUT',
+    headers: { Authorization: `token ${c.token}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) { const e = await r.json(); throw new Error(e.message || 'Erro ao salvar'); }
+  const j = await r.json();
+  fileSHA = j.content.sha;
+}
+
+function schedSave() {
+  clearTimeout(_saveTimer);
+  setSync('ld', 'Salvando no GitHub...');
+  _saveTimer = setTimeout(doSave, 1800);
+}
+
+async function doSave() {
+  try {
+    await ghPut({ produtos, lancamentos, savedAt: new Date().toISOString() });
+    setSync('ok', 'Salvo · ' + new Date().toLocaleString('pt-BR'));
+  } catch(e) {
+    setSync('er', 'Erro: ' + e.message);
+    toast('⚠️ ' + e.message, 4000);
+  }
+}
+
+document.getElementById('btn-save').addEventListener('click', async function() {
+  clearTimeout(_saveTimer);
+  await doSave();
+  toast('💾 Dados salvos no GitHub!');
+});
+
+async function loadData() {
+  setSync('ld', 'Carregando dados do GitHub...');
+  const d = await ghGet();
+  if (d) {
+    produtos    = d.produtos    || [];
+    lancamentos = d.lancamentos || [];
+    const at = d.savedAt ? new Date(d.savedAt).toLocaleString('pt-BR') : '—';
+    setSync('ok', 'Sincronizado · Último save: ' + at);
+  } else {
+    setSync('ok', 'Pronto · nenhum dado ainda');
+  }
+  renderAll();
+}
+
+// Nav (tabs dentro do app)
+function switchTab(tab) {
+  document.querySelectorAll('.nb, .mb').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('on', p.id === 'panel-' + tab));
+}
+document.querySelectorAll('.nb, .mb').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
+
+// Date
+const hoje = new Date();
+const hStr = hoje.toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+document.getElementById('d-hoje').textContent = hStr.charAt(0).toUpperCase() + hStr.slice(1);
+document.getElementById('d-badge').textContent = hoje.toLocaleDateString('pt-BR');
+
+// ═══ ANALYTICS ═══
+function pNome(id) { const p = produtos.find(x => x.id === id); return p ? p.nome : '(removido)'; }
+
+function calcRes(plat) {
+  const it = plat === 'all' ? lancamentos : lancamentos.filter(l => l.plataforma === plat);
+  const custo = it.reduce((s,l) => s + l.valorUsd * l.taxaDolar, 0);
+  const receb = it.reduce((s,l) => s + l.valorReceb, 0);
+  const lucro = receb - custo;
+  const qtd   = it.reduce((s,l) => s + l.quantidade, 0);
+  const mg    = receb > 0 ? lucro / receb * 100 : 0;
+  const roi   = custo > 0 ? lucro / custo * 100 : 0;
+  return { custo, receb, lucro, qtd, count: it.length, mg, roi };
+}
+
+function monthlyData(plat) {
+  const it = plat === 'all' ? lancamentos : lancamentos.filter(l => l.plataforma === plat);
+  const mp = {};
+  it.forEach(l => {
+    if (!l.data) return;
+    const [y, m] = l.data.split('-');
+    const k = y + '-' + m;
+    if (!mp[k]) mp[k] = { lucro:0, receb:0, custo:0 };
+    const c = l.valorUsd * l.taxaDolar;
+    mp[k].lucro += l.valorReceb - c;
+    mp[k].receb += l.valorReceb;
+    mp[k].custo += c;
+  });
+  const keys = Object.keys(mp).sort();
+  return {
+    labels: keys.map(k => { const[y,m]=k.split('-'); return new Date(+y,+m-1).toLocaleDateString('pt-BR',{month:'short',year:'2-digit'}); }),
+    lucro:  keys.map(k => mp[k].lucro),
+    receb:  keys.map(k => mp[k].receb),
+    custo:  keys.map(k => mp[k].custo),
+  };
+}
+
+// ═══ CHARTS ═══
+function mkChart(id, cfg) {
+  if (charts[id]) { charts[id].destroy(); }
+  const el = document.getElementById(id);
+  if (!el) return;
+  charts[id] = new Chart(el, cfg);
+}
+
+const TTP = { backgroundColor:'rgba(9,7,14,0.95)', titleFont:{family:'Plus Jakarta Sans',size:12,weight:'700'}, bodyFont:{family:'JetBrains Mono',size:11}, padding:10, borderColor:'rgba(255,255,255,0.07)', borderWidth:1 };
+const XAXIS = { grid:{display:false}, ticks:{color:'rgba(255,255,255,0.45)',font:{family:'Plus Jakarta Sans',size:10}}, border:{display:false} };
+const YAXIS = { grid:{color:'rgba(255,255,255,0.05)'}, ticks:{color:'rgba(255,255,255,0.4)',font:{family:'JetBrains Mono',size:9},callback:v=>'R$'+v.toLocaleString('pt-BR')}, border:{display:false} };
+
+function renderCharts() {
+  const rS = calcRes('shopee'), rM = calcRes('ml');
+  const mA = monthlyData('all'), mS = monthlyData('shopee'), mM = monthlyData('ml');
+
+  // Line - geral
+  mkChart('ch-line', { type:'line', data:{ labels:mA.labels, datasets:[{label:'Lucro',data:mA.lucro,borderColor:'rgba(240,80,122,1)',backgroundColor:'rgba(240,80,122,0.07)',fill:true,tension:.4,pointBackgroundColor:'rgba(240,80,122,1)',pointRadius:4,pointHoverRadius:6}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TTP,callbacks:{label:c=>' '+R(c.raw)}}},scales:{x:XAXIS,y:YAXIS}}});
+
+  // Donut
+  mkChart('ch-donut', { type:'doughnut', data:{labels:['Shopee','Mercado Livre'],datasets:[{data:[rS.receb,rM.receb],backgroundColor:['rgba(255,102,0,0.85)','rgba(200,200,200,0.75)'],borderColor:['rgba(248,113,113,0.3)','rgba(230,180,85,0.3)'],borderWidth:2,hoverOffset:6}]}, options:{responsive:true,maintainAspectRatio:false,cutout:'66%',plugins:{legend:{position:'bottom',labels:{color:'rgba(255,255,255,0.55)',font:{family:'Plus Jakarta Sans',size:11},usePointStyle:true,padding:14}},tooltip:{...TTP,callbacks:{label:c=>' '+R(c.raw)}}}}});
+
+  // Bar compare
+  mkChart('ch-bar', { type:'bar', data:{labels:['Investido','Recebido','Lucro'],datasets:[{label:'Shopee',data:[rS.custo,rS.receb,rS.lucro],backgroundColor:'rgba(255,102,0,0.85)',borderRadius:7,maxBarThickness:38},{label:'ML',data:[rM.custo,rM.receb,rM.lucro],backgroundColor:'rgba(200,200,200,0.75)',borderRadius:7,maxBarThickness:38}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TTP,callbacks:{label:c=>' '+R(c.raw)}}},scales:{x:{...XAXIS,ticks:{color:'rgba(255,255,255,0.55)',font:{family:'Plus Jakarta Sans',size:11}}},y:YAXIS}}});
+
+  // Radar
+  const rAll = calcRes('all');
+  const norm = (v, max) => max > 0 ? Math.min(v/max*100, 100) : 0;
+  mkChart('ch-radar', { type:'radar', data:{labels:['Margem %','ROI %','Volume vendas','Participação receita','Lucro relativo'], datasets:[{label:'Shopee',data:[norm(rS.mg,100),norm(rS.roi,200),norm(rS.qtd,rAll.qtd||1)*100,norm(rS.receb,rAll.receb||1)*100,norm(Math.max(rS.lucro,0),Math.max(rAll.lucro,1))*100],borderColor:'rgba(255,102,0,0.9)',backgroundColor:'rgba(255,102,0,0.08)',pointBackgroundColor:'rgba(255,102,0,1)',pointRadius:4},{label:'ML',data:[norm(rM.mg,100),norm(rM.roi,200),norm(rM.qtd,rAll.qtd||1)*100,norm(rM.receb,rAll.receb||1)*100,norm(Math.max(rM.lucro,0),Math.max(rAll.lucro,1))*100],borderColor:'rgba(180,180,180,0.9)',backgroundColor:'rgba(200,200,200,0.05)',pointBackgroundColor:'rgba(180,180,180,1)',pointRadius:4}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'rgba(255,255,255,0.5)',font:{family:'Plus Jakarta Sans',size:10},usePointStyle:true}}},scales:{r:{grid:{color:'rgba(255,255,255,0.06)'},angleLines:{color:'rgba(255,255,255,0.05)'},ticks:{display:false},pointLabels:{color:'rgba(255,255,255,0.5)',font:{family:'Plus Jakarta Sans',size:9}}}}}});
+
+  // Shopee line + bar
+  mkChart('ch-sh-l', { type:'line', data:{labels:mS.labels.length?mS.labels:['—'],datasets:[{label:'Lucro',data:mS.lucro.length?mS.lucro:[0],borderColor:'rgba(255,102,0,1)',backgroundColor:'rgba(255,102,0,0.07)',fill:true,tension:.4,pointRadius:3,pointHoverRadius:5}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TTP,callbacks:{label:c=>' '+R(c.raw)}}},scales:{x:XAXIS,y:YAXIS}}});
+  mkChart('ch-sh-b', { type:'bar', data:{labels:mS.labels.length?mS.labels:['—'],datasets:[{label:'Investido',data:mS.custo.length?mS.custo:[0],backgroundColor:'rgba(255,255,255,0.12)',borderRadius:5,maxBarThickness:24},{label:'Recebido',data:mS.receb.length?mS.receb:[0],backgroundColor:'rgba(255,102,0,0.85)',borderRadius:5,maxBarThickness:24}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'rgba(255,255,255,0.5)',font:{size:10},usePointStyle:true}},tooltip:{callbacks:{label:c=>' '+R(c.raw)}}},scales:{x:XAXIS,y:YAXIS}}});
+
+  // ML line + bar
+  mkChart('ch-ml-l', { type:'line', data:{labels:mM.labels.length?mM.labels:['—'],datasets:[{label:'Lucro',data:mM.lucro.length?mM.lucro:[0],borderColor:'rgba(180,180,180,1)',backgroundColor:'rgba(200,200,200,0.05)',fill:true,tension:.4,pointRadius:3,pointHoverRadius:5}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TTP,callbacks:{label:c=>' '+R(c.raw)}}},scales:{x:XAXIS,y:YAXIS}}});
+  mkChart('ch-ml-b', { type:'bar', data:{labels:mM.labels.length?mM.labels:['—'],datasets:[{label:'Investido',data:mM.custo.length?mM.custo:[0],backgroundColor:'rgba(255,255,255,0.12)',borderRadius:5,maxBarThickness:24},{label:'Recebido',data:mM.receb.length?mM.receb:[0],backgroundColor:'rgba(200,200,200,0.75)',borderRadius:5,maxBarThickness:24}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'rgba(255,255,255,0.5)',font:{size:10},usePointStyle:true}},tooltip:{callbacks:{label:c=>' '+R(c.raw)}}},scales:{x:XAXIS,y:YAXIS}}});
+}
+
+// ═══ KPIs ═══
+function renderKPIs() {
+  const rA=calcRes('all'), rS=calcRes('shopee'), rM=calcRes('ml');
+  document.getElementById('kpi-r1').innerHTML = `
+    <div class="kpi ac"><div class="kl">Lucro Total</div><div class="kv">${R(rA.lucro)}</div><div class="ks">Todas as plataformas</div><div class="kbadge ${rA.lucro>=0?'up':'dn'}">${rA.lucro>=0?'▲':'▼'} ${Pct(Math.abs(rA.mg))}</div></div>
+    <div class="kpi gd"><div class="kl">Receita Total</div><div class="kv">${R(rA.receb)}</div><div class="ks">Total recebido</div></div>
+    <div class="kpi"><div class="kl">Total Investido</div><div class="kv">${R(rA.custo)}</div><div class="ks">Custo de aquisição</div></div>
+    <div class="kpi pu"><div class="kl">ROI Geral</div><div class="kv">${Pct(rA.roi)}</div><div class="ks">Retorno sobre investimento</div></div>`;
+  document.getElementById('kpi-r2').innerHTML = `
+    <div class="kpi bl"><div class="kl">Unidades Vendidas</div><div class="kv">${rA.qtd}</div><div class="ks">${rA.count} lançamentos</div></div>
+    <div class="kpi"><div class="kl">Lucro Shopee</div><div class="kv">${R(rS.lucro)}</div><div class="ks">Margem ${Pct(rS.mg)} · ROI ${Pct(rS.roi)}</div><div class="kbadge ${rS.lucro>=0?'up':'dn'}">${Pct(rS.mg)}</div></div>
+    <div class="kpi"><div class="kl">Lucro Mercado Livre</div><div class="kv">${R(rM.lucro)}</div><div class="ks">Margem ${Pct(rM.mg)} · ROI ${Pct(rM.roi)}</div><div class="kbadge ${rM.lucro>=0?'up':'dn'}">${Pct(rM.mg)}</div></div>
+    <div class="kpi"><div class="kl">Ticket Médio</div><div class="kv">${rA.count>0?R(rA.receb/rA.count):'R$ 0,00'}</div><div class="ks">Por lançamento registrado</div></div>`;
+}
+
+function renderKPIsPlat(plat, gridId) {
+  const r = calcRes(plat);
+  document.getElementById(gridId).innerHTML = `
+    <div class="kpi ac"><div class="kl">Lucro</div><div class="kv">${R(r.lucro)}</div><div class="ks">Margem ${Pct(r.mg)}</div><div class="kbadge ${r.lucro>=0?'up':'dn'}">${r.lucro>=0?'▲':'▼'} ${Pct(Math.abs(r.mg))}</div></div>
+    <div class="kpi gd"><div class="kl">Receita</div><div class="kv">${R(r.receb)}</div><div class="ks">Total recebido</div></div>
+    <div class="kpi"><div class="kl">Investido</div><div class="kv">${R(r.custo)}</div><div class="ks">Custo total</div></div>
+    <div class="kpi pu"><div class="kl">ROI</div><div class="kv">${Pct(r.roi)}</div><div class="ks">${r.qtd} unidades · ${r.count} vendas</div></div>`;
+}
+
+// ═══ PLAT STATS ═══
+function renderPlatStats() {
+  const rS=calcRes('shopee'), rM=calcRes('ml');
+  const tot = rS.receb + rM.receb || 1;
+  document.getElementById('plat-stats').innerHTML = `
+    <div style="margin-bottom:14px;">
+      <div class="stat-row"><span class="lbl" style="color:#f87171;font-weight:700;">Shopee</span><span class="val" style="color:${rS.lucro>=0?'var(--gr)':'var(--rd)'};">${R(rS.lucro)}</span></div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${(rS.receb/tot*100).toFixed(1)}%;background:linear-gradient(90deg,#f87171,#fb923c);"></div></div>
+      <div style="font-size:0.7rem;color:var(--tx3);margin-top:3px;">${(rS.receb/tot*100).toFixed(1)}% da receita · ${rS.count} vendas · ROI ${Pct(rS.roi)}</div>
+    </div>
+    <div>
+      <div class="stat-row"><span class="lbl" style="color:var(--g2);font-weight:700;">Mercado Livre</span><span class="val" style="color:${rM.lucro>=0?'var(--gr)':'var(--rd)'};">${R(rM.lucro)}</span></div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${(rM.receb/tot*100).toFixed(1)}%;background:linear-gradient(90deg,var(--g1),var(--g2));"></div></div>
+      <div style="font-size:0.7rem;color:var(--tx3);margin-top:3px;">${(rM.receb/tot*100).toFixed(1)}% da receita · ${rM.count} vendas · ROI ${Pct(rM.roi)}</div>
+    </div>`;
+}
+
+// ═══ TOP PRODS ═══
+function renderTopProds() {
+  const mp = {};
+  lancamentos.forEach(l => {
+    const n = pNome(l.produtoId);
+    if (!mp[n]) mp[n] = { receb:0, lucro:0, qtd:0 };
+    const c = l.valorUsd * l.taxaDolar;
+    mp[n].receb += l.valorReceb; mp[n].lucro += l.valorReceb - c; mp[n].qtd += l.quantidade;
+  });
+  const top = Object.entries(mp).sort((a,b) => b[1].receb - a[1].receb).slice(0,5);
+  const el  = document.getElementById('top-prods');
+  if (!top.length) { el.innerHTML='<div class="empty"><div class="eg"></div><p>Sem dados ainda</p></div>'; return; }
+  const maxR = top[0][1].receb || 1;
+  el.innerHTML = top.map(([n,d]) => `
+    <div style="margin-bottom:10px;">
+      <div class="stat-row" style="padding:4px 0;"><span class="lbl">${esc(n)}</span><span class="val">${R(d.receb)}</span></div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${(d.receb/maxR*100).toFixed(1)}%;background:linear-gradient(90deg,var(--v2),var(--pk));"></div></div>
+      <div style="font-size:0.68rem;color:var(--tx3);margin-top:2px;">${d.qtd} un. · Lucro ${R(d.lucro)}</div>
+    </div>`).join('');
+}
+
+// ═══ TABLES ═══
+function tblHTML(itens, showPlat) {
+  if (!itens.length) return `<div class="empty"><div class="eg"></div><p>Nenhum lançamento registrado ainda.</p></div>`;
+  const ord = [...itens].sort((a,b) => (b.data||'').localeCompare(a.data||''));
+  return `<table><thead><tr>
+    ${showPlat?'<th>Plataforma</th>':''}
+    <th>Data</th><th>Produto</th><th>Qtd</th><th>Pago US$</th><th>Cotação</th><th>Custo R$</th><th>Recebido R$</th><th>Margem</th><th>ROI</th><th>Lucro</th><th></th>
+  </tr></thead><tbody>
+  ${ord.map(l => {
+    const c=l.valorUsd*l.taxaDolar, lu=l.valorReceb-c,
+          mg=l.valorReceb>0?lu/l.valorReceb*100:0,
+          roi=c>0?lu/c*100:0;
+    return `<tr>
+      ${showPlat?`<td><span class="chip ${l.plataforma==='shopee'?'sh':'ml'}">${l.plataforma==='shopee'?'Shopee':'Mercado Livre'}</span></td>`:''}
+      <td class="mn">${l.data?l.data.split('-').reverse().join('/'):'—'}</td>
+      <td>${esc(pNome(l.produtoId))}</td>
+      <td class="mn">${l.quantidade}</td>
+      <td class="mn">${U(l.valorUsd)}</td>
+      <td class="mn">${(l.taxaDolar||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:4})}</td>
+      <td class="mn">${R(c)}</td>
+      <td class="mn">${R(l.valorReceb)}</td>
+      <td class="mn" style="color:${mg>=0?'var(--gr)':'var(--rd)'}">${mg.toFixed(1)}%</td>
+      <td class="mn" style="color:${roi>=0?'var(--gr)':'var(--rd)'}">${roi.toFixed(1)}%</td>
+      <td class="${lu>=0?'pup':'pdn'}">${R(lu)}</td>
+      <td><button class="dbtn" data-id="${l.id}">✕</button></td>
+    </tr>`;
+  }).join('')}</tbody></table>`;
+}
+
+function bindDel() {
+  document.querySelectorAll('.dbtn[data-id]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Remover lançamento?')) return;
+      lancamentos = lancamentos.filter(l => l.id !== btn.dataset.id);
+      schedSave(); renderAll(); toast('Lançamento removido.');
+    });
+  });
+}
+
+// ═══ PRODUCTS ═══
+function renderProds() {
+  const el = document.getElementById('tbl-prod');
+  if (!produtos.length) { el.innerHTML = `<div class="empty"><div class="eg"></div><p>Nenhum produto cadastrado.</p></div>`; return; }
+  el.innerHTML = `<table><thead><tr><th>Produto</th><th>Estoque</th><th></th></tr></thead><tbody>
+    ${produtos.map(p=>`<tr>
+      <td>${esc(p.nome)}</td>
+      <td><span class="${p.estoque<=3?'blo':'bok'}">${p.estoque} un.${p.estoque<=3?' ⚠':''}</span></td>
+      <td><button class="dbtn" data-pid="${p.id}">✕</button></td>
+    </tr>`).join('')}
+  </tbody></table>`;
+  el.querySelectorAll('[data-pid]').forEach(btn => btn.addEventListener('click', async () => {
+    if (!confirm('Remover produto?')) return;
+    produtos = produtos.filter(p => p.id !== btn.dataset.pid);
+    schedSave(); renderAll(); toast('Produto removido.');
+  }));
+}
+
+document.getElementById('btn-prod').addEventListener('click', () => {
+  const n = document.getElementById('p-nome').value.trim();
+  const e = +document.getElementById('p-est').value || 0;
+  if (!n) { toast('Digite o nome do produto.'); return; }
+  produtos.push({ id: uid(), nome: n, estoque: e });
+  document.getElementById('p-nome').value = '';
+  document.getElementById('p-est').value  = '';
+  schedSave(); renderAll(); toast('Produto cadastrado! ✓');
+});
+
+document.getElementById('btn-excel').addEventListener('click', () => {
+  if (!produtos.length) { toast('Sem produtos.'); return; }
+  const ws = XLSX.utils.json_to_sheet(produtos.map(p => ({ Produto: p.nome, Estoque: p.estoque })));
+  ws['!cols'] = [{wch:40},{wch:12}];
+  const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Estoque');
+  XLSX.writeFile(wb, 'estoque_tekoporatec.xlsx'); toast('Excel exportado!');
+});
+
+document.getElementById('btn-pdf').addEventListener('click', () => {
+  if (!produtos.length) { toast('Sem produtos.'); return; }
+  const { jsPDF } = window.jspdf, doc = new jsPDF();
+  doc.setFontSize(16); doc.setTextColor(122,23,54); doc.text('TekoporãTec — Estoque', 14, 18);
+  doc.setFontSize(10); doc.setTextColor(110,99,132); doc.text('Gerado em ' + new Date().toLocaleDateString('pt-BR'), 14, 26);
+  doc.autoTable({ startY:32, head:[['Produto','Estoque']], body:produtos.map(p=>[p.nome,String(p.estoque)]), headStyles:{fillColor:[122,23,54]}, styles:{fontSize:10} });
+  doc.save('estoque_tekoporatec.pdf'); toast('PDF exportado!');
+});
+
+// ═══ LAUNCH FORM ═══
+let activePlat = 'shopee';
+
+function setPlat(p) {
+  activePlat = p;
+  document.getElementById('plat-badge').textContent  = p === 'shopee' ? 'Shopee' : 'Mercado Livre';
