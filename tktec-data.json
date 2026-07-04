@@ -18,7 +18,7 @@
     {
       "id": "mr3fl4g8u202",
       "nome": "TP-LINK EAP110 OUTDOOR 300MBPS",
-      "estoque": 20
+      "estoque": 19
     },
     {
       "id": "mr3fxitzrpb2",
@@ -96,7 +96,17 @@
       "taxaDolar": 5.28,
       "valorReceb": 302.59,
       "data": "2026-06-15"
+    },
+    {
+      "id": "mr6c3gsk6i69",
+      "plataforma": "shopee",
+      "produtoId": "mr3fl4g8u202",
+      "quantidade": 1,
+      "valorUsd": 27.5,
+      "taxaDolar": 5.3,
+      "valorReceb": 205.34,
+      "data": "2026-06-25"
     }
   ],
-  "savedAt": "2026-07-04T12:21:56.514Z"
+  "savedAt": "2026-07-04T12:24:09.180Z"
 }
