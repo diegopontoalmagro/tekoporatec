@@ -48,16 +48,6 @@
       "data": "2026-06-29"
     },
     {
-      "id": "mr3ftc00b2wx",
-      "plataforma": "shopee",
-      "produtoId": "mr3dijdvv1f2",
-      "quantidade": 2,
-      "valorUsd": 88,
-      "taxaDolar": 5.28,
-      "valorReceb": 634.28,
-      "data": "2026-07-30"
-    },
-    {
       "id": "mr6bcdgwankh",
       "plataforma": "shopee",
       "produtoId": "mr3dijdvv1f2",
@@ -148,5 +138,5 @@
       "data": "2026-06-30"
     }
   ],
-  "savedAt": "2026-07-04T12:41:12.585Z"
+  "savedAt": "2026-07-04T12:41:29.560Z"
 }
