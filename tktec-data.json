@@ -8,7 +8,7 @@
     {
       "id": "mr3fjuhouvmg",
       "nome": "BROADLINK UNIVERSAL CONTROL RM4 MINI",
-      "estoque": 16
+      "estoque": 15
     },
     {
       "id": "mr3fkg3p17nu",
@@ -166,7 +166,17 @@
       "taxaDolar": 5.28,
       "valorReceb": 339.54,
       "data": "2026-06-17"
+    },
+    {
+      "id": "mr6d3dc7ed8s",
+      "plataforma": "ml",
+      "produtoId": "mr3fjuhouvmg",
+      "quantidade": 1,
+      "valorUsd": 10.5,
+      "taxaDolar": 5.28,
+      "valorReceb": 113.18,
+      "data": "2026-06-22"
     }
   ],
-  "savedAt": "2026-07-04T12:50:44.620Z"
+  "savedAt": "2026-07-04T12:52:04.312Z"
 }
