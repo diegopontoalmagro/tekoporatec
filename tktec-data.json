@@ -186,17 +186,7 @@
       "taxaDolar": 5.28,
       "valorReceb": 113.18,
       "data": "2026-06-22"
-    },
-    {
-      "id": "mr6d6fhkgrh5",
-      "plataforma": "ml",
-      "produtoId": "mr3dijdvv1f2",
-      "quantidade": 1,
-      "valorUsd": 10,
-      "taxaDolar": 5.3,
-      "valorReceb": 113.18,
-      "data": "2026-06-25"
     }
   ],
-  "savedAt": "2026-07-04T12:54:26.743Z"
+  "savedAt": "2026-07-04T12:56:39.361Z"
 }
