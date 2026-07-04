@@ -23,7 +23,7 @@
     {
       "id": "mr3fxitzrpb2",
       "nome": "FONE BLACKVIEW OPEN-EAR WIRELESS AIRBUDS 200 ECLIPSE BLACK",
-      "estoque": 1
+      "estoque": 0
     }
   ],
   "lancamentos": [
@@ -196,7 +196,17 @@
       "taxaDolar": 5.3,
       "valorReceb": 113.18,
       "data": "2026-06-25"
+    },
+    {
+      "id": "mr6db5uvc09s",
+      "plataforma": "ml",
+      "produtoId": "mr3fxitzrpb2",
+      "quantidade": 1,
+      "valorUsd": 15,
+      "taxaDolar": 5.5,
+      "valorReceb": 160.88,
+      "data": "2026-07-04"
     }
   ],
-  "savedAt": "2026-07-04T12:57:01.161Z"
+  "savedAt": "2026-07-04T12:58:07.863Z"
 }
