@@ -208,16 +208,6 @@
       "data": "2026-07-04"
     },
     {
-      "id": "mr6dchty8e8w",
-      "plataforma": "ml",
-      "produtoId": "mr3fjuhouvmg",
-      "quantidade": 1,
-      "valorUsd": 10,
-      "taxaDolar": 5.3,
-      "valorReceb": 113.18,
-      "data": "2026-07-04"
-    },
-    {
       "id": "mr6dd0onxay1",
       "plataforma": "ml",
       "produtoId": "mr3fjuhouvmg",
@@ -228,5 +218,5 @@
       "data": "2026-07-03"
     }
   ],
-  "savedAt": "2026-07-04T12:59:34.466Z"
+  "savedAt": "2026-07-04T13:00:37.713Z"
 }
