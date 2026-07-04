@@ -3,7 +3,7 @@
     {
       "id": "mr3dijdvv1f2",
       "nome": "TP-LINK RE505X",
-      "estoque": 7
+      "estoque": 6
     },
     {
       "id": "mr3fjuhouvmg",
@@ -136,7 +136,17 @@
       "taxaDolar": 5.28,
       "valorReceb": 315.93,
       "data": "2026-06-30"
+    },
+    {
+      "id": "mr6cqbsx9h0k",
+      "plataforma": "shopee",
+      "produtoId": "mr3dijdvv1f2",
+      "quantidade": 1,
+      "valorUsd": 44,
+      "taxaDolar": 5.28,
+      "valorReceb": 317.14,
+      "data": "2026-06-30"
     }
   ],
-  "savedAt": "2026-07-04T12:41:29.560Z"
+  "savedAt": "2026-07-04T12:41:55.801Z"
 }
