@@ -24,6 +24,11 @@
       "id": "mr3fxitzrpb2",
       "nome": "FONE BLACKVIEW OPEN-EAR WIRELESS AIRBUDS 200 ECLIPSE BLACK",
       "estoque": 0
+    },
+    {
+      "id": "mrauuqwia6el",
+      "nome": "MERCUSYS ROUTER AC1900 6ANT MR50G",
+      "estoque": 20
     }
   ],
   "lancamentos": [
@@ -238,5 +243,5 @@
       "data": "2026-07-06"
     }
   ],
-  "savedAt": "2026-07-06T18:05:38.071Z"
+  "savedAt": "2026-07-07T16:20:19.777Z"
 }
