@@ -13,7 +13,7 @@
     {
       "id": "mr3fkg3p17nu",
       "nome": "MERCUSYS REPETIDOR ME30 AC1200",
-      "estoque": 17
+      "estoque": 16
     },
     {
       "id": "mr3fl4g8u202",
@@ -261,7 +261,17 @@
       "taxaDolar": 5.27777,
       "valorReceb": 163.19,
       "data": "2026-07-08"
+    },
+    {
+      "id": "mrcd8bf083e6",
+      "plataforma": "shopee",
+      "produtoId": "mr3fkg3p17nu",
+      "quantidade": 1,
+      "valorUsd": 17.7,
+      "taxaDolar": 5.29358,
+      "valorReceb": 133.94,
+      "data": "2026-07-08"
     }
   ],
-  "savedAt": "2026-07-08T12:16:14.969Z"
+  "savedAt": "2026-07-08T17:42:32.158Z"
 }
