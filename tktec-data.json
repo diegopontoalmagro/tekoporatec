@@ -28,7 +28,7 @@
     {
       "id": "mrauuqwia6el",
       "nome": "MERCUSYS ROUTER AC1900 6ANT MR50G",
-      "estoque": 20
+      "estoque": 19
     }
   ],
   "lancamentos": [
@@ -251,7 +251,17 @@
       "taxaDolar": 5.3,
       "valorReceb": 267.88,
       "data": "2026-07-07"
+    },
+    {
+      "id": "mrc1kpkfnzns",
+      "plataforma": "shopee",
+      "produtoId": "mrauuqwia6el",
+      "quantidade": 1,
+      "valorUsd": 18,
+      "taxaDolar": 5.27777,
+      "valorReceb": 163.19,
+      "data": "2026-07-08"
     }
   ],
-  "savedAt": "2026-07-07T17:52:12.270Z"
+  "savedAt": "2026-07-08T12:16:14.969Z"
 }
